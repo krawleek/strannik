@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "savingsUnlockThemeId": "theme2",
+  "resources": [
+    {
+      "id": "titanium",
+      "title": "Титан"
+    },
+    {
+      "id": "iron",
+      "title": "Железо"
+    },
+    {
+      "id": "fuel",
+      "title": "Топливо"
+    },
+    {
+      "id": "medicine",
+      "title": "Лекарства"
+    }
+  ],
+  "items": [
+    {
+      "id": "scarf",
+      "title": "Шарфик",
+      "category": "accessory",
+      "price": 15,
+      "interactionXp": 0,
+      "assetId": "placeholder",
+      "description": "Тестовый предмет"
+    },
+    {
+      "id": "treat",
+      "title": "Лакомство",
+      "category": "treat",
+      "price": 5,
+      "interactionXp": 5,
+      "assetId": "placeholder",
+      "description": "Тестовый предмет"
+    },
+    {
+      "id": "ball",
+      "title": "Мяч",
+      "category": "toy",
+      "price": 10,
+      "interactionXp": 10,
+      "assetId": "placeholder",
+      "description": "Тестовый предмет"
+    },
+    {
+      "id": "titanium",
+      "title": "Титан",
+      "category": "shipMaterial",
+      "price": 2,
+      "resourceId": "titanium",
+      "assetId": "placeholder",
+      "description": "Тестовый материал"
+    },
+    {
+      "id": "iron",
+      "title": "Железо",
+      "category": "shipMaterial",
+      "price": 2,
+      "resourceId": "iron",
+      "assetId": "placeholder",
+      "description": "Тестовый материал"
+    },
+    {
+      "id": "fuel",
+      "title": "Топливо",
+      "category": "shipMaterial",
+      "price": 2,
+      "resourceId": "fuel",
+      "assetId": "placeholder",
+      "description": "Тестовый материал"
+    },
+    {
+      "id": "medicine",
+      "title": "Лекарства",
+      "category": "shipMaterial",
+      "price": 2,
+      "resourceId": "medicine",
+      "assetId": "placeholder",
+      "description": "Тестовый материал"
+    }
+  ],
+  "themes": [
+    {
+      "id": "theme1",
+      "title": "Тема 1",
+      "order": 0
+    },
+    {
+      "id": "theme2",
+      "title": "Тема 2",
+      "order": 1
+    },
+    {
+      "id": "theme3",
+      "title": "Тема 3",
+      "order": 2
+    },
+    {
+      "id": "fraud",
+      "title": "Безопасность",
+      "order": 3
+    }
+  ],
+  "tasks": [
+    {
+      "id": "theme1_task",
+      "themeId": "theme1",
+      "title": "Пример задания",
+      "type": "choice",
+      "rewardFira": 20,
+      "order": 0,
+      "contentReference": "placeholder",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "theme2_task",
+      "themeId": "theme2",
+      "title": "Пример задания",
+      "type": "choice",
+      "rewardFira": 20,
+      "order": 0,
+      "contentReference": "placeholder",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "theme3_task",
+      "themeId": "theme3",
+      "title": "Пример задания",
+      "type": "choice",
+      "rewardFira": 20,
+      "order": 0,
+      "contentReference": "placeholder",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "fraud_task",
+      "themeId": "fraud",
+      "title": "Пример задания",
+      "type": "choice",
+      "rewardFira": 20,
+      "order": 0,
+      "contentReference": "placeholder",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "practice",
+      "themeId": "theme1",
+      "title": "Дополнительное учебное задание",
+      "type": "choice",
+      "rewardFira": 5,
+      "order": 1,
+      "contentReference": "placeholder",
+      "rewardPolicy": "repeatable",
+      "repeatRule": "newCompletedAttempt"
+    }
+  ],
+  "stageRequirements": [
+    {
+      "bigGoal": "repairShip",
+      "from": "earth",
+      "to": "space",
+      "requiredXp": 10,
+      "workXp": 1,
+      "resources": [
+        {
+          "resourceId": "titanium",
+          "amount": 2
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "bigGoal": "repairShip",
+      "from": "space",
+      "to": "homePlanet",
+      "requiredXp": 20,
+      "workXp": 1,
+      "resources": [
+        {
+          "resourceId": "titanium",
+          "amount": 2
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "bigGoal": "contactHome",
+      "from": "earth",
+      "to": "space",
+      "requiredXp": 10,
+      "workXp": 1,
+      "resources": [
+        {
+          "resourceId": "titanium",
+          "amount": 2
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "bigGoal": "contactHome",
+      "from": "space",
+      "to": "homePlanet",
+      "requiredXp": 20,
+      "workXp": 1,
+      "resources": [
+        {
+          "resourceId": "titanium",
+          "amount": 2
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "bigGoal": "adaptOnEarth",
+      "from": "earth",
+      "to": "space",
+      "requiredXp": 10,
+      "workXp": 1,
+      "resources": [
+        {
+          "resourceId": "titanium",
+          "amount": 2
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "bigGoal": "adaptOnEarth",
+      "from": "space",
+      "to": "homePlanet",
+      "requiredXp": 20,
+      "workXp": 1,
+      "resources": [
+        {
+          "resourceId": "titanium",
+          "amount": 2
+        },
+        {
+          "resourceId": "fuel",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}
