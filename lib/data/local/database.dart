@@ -4,11 +4,12 @@ import '../../core/result.dart';
 import '../../domain/repositories/repositories.dart';
 import '../repositories/sqlite_repositories.dart';
 import 'migrations/schema_v1.dart';
+import 'migrations/schema_v2.dart';
 
 class LocalDatabase implements UnitOfWork {
   LocalDatabase._(this.database);
   final Database database;
-  static const schemaVersion = 1;
+  static const schemaVersion = 2;
 
   static Future<LocalDatabase> open(
     String path, {
@@ -38,6 +39,11 @@ class LocalDatabase implements UnitOfWork {
   ) async {
     if (oldVersion < 1 && newVersion >= 1) {
       for (final sql in schemaV1) {
+        await db.execute(sql);
+      }
+    }
+    if (oldVersion < 2 && newVersion >= 2) {
+      for (final sql in schemaV2) {
         await db.execute(sql);
       }
     }

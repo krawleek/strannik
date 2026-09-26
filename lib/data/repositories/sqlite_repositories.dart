@@ -510,5 +510,10 @@ class SqliteRepositories
     await resetProgress();
     await db.delete('child_profile');
     await saveParentSettings(const ParentSettings());
+    await db.update('app_state', {
+      'sound_enabled': 1,
+      'music_enabled': 1,
+      'haptics_enabled': 1,
+    }, where: 'id = 1');
   }
 }

@@ -1,6 +1,8 @@
 import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' show getDatabasesPath;
 
+import 'feedback/feedback_services.dart';
+import '../data/repositories/sqlite_feedback_settings_store.dart';
 import '../core/clock.dart';
 import '../data/local/database.dart';
 import '../data/security/pbkdf2_pin_hasher.dart';
@@ -59,3 +61,7 @@ class GameServices {
 
 Future<LocalDatabase> openGameDatabase() async =>
     LocalDatabase.open(path.join(await getDatabasesPath(), 'strannik.db'));
+
+/// Uses the same open local database; no player, assets or network initialized.
+FeedbackServices createFeedbackServices(LocalDatabase database) =>
+    FeedbackServices(store: SqliteFeedbackSettingsStore(database.database));

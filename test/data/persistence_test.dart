@@ -192,7 +192,7 @@ void main() {
       await h.db.close();
       h = await Harness.create(path: path);
       expect(await h.balance(), 107);
-      expect(await h.db.database.getVersion(), 1);
+      expect(await h.db.database.getVersion(), LocalDatabase.schemaVersion);
       expect(
         (await h.db.database.rawQuery('PRAGMA integrity_check'))
             .first
