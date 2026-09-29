@@ -8,15 +8,22 @@ class StrannikSpeechBubble extends StatelessWidget {
     super.key,
     required this.name,
     required this.child,
+    this.compact = false,
   });
   final String name;
   final Widget child;
+  final bool compact;
   @override
   Widget build(BuildContext context) => Stack(
     clipBehavior: Clip.none,
     children: [
       Positioned.fill(top: 14, child: const _BubbleArtwork()),
-      Padding(padding: const EdgeInsets.fromLTRB(20, 50, 20, 30), child: child),
+      Padding(
+        padding: compact
+            ? const EdgeInsets.fromLTRB(15, 36, 17, 26)
+            : const EdgeInsets.fromLTRB(20, 50, 20, 30),
+        child: child,
+      ),
       Positioned(
         top: 0,
         left: 16,

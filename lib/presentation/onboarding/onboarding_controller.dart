@@ -6,14 +6,35 @@ import '../../core/result.dart';
 
 // Draft navigation is deliberately transient; SQLite owns completion only.
 enum OnboardingStep {
-  intro, beam, arrival, street, childName, help, disguise, skin, petName,
-  askParents, doorstep, parentVoice, petPersuades, handoff, parentHello,
-  parentOffer, money, care, results, permission, pin, parentReady, childReady,
+  intro,
+  beam,
+  arrival,
+  street,
+  childName,
+  help,
+  disguise,
+  skin,
+  petName,
+  askParents,
+  doorstep,
+  parentVoice,
+  petPersuades,
+  handoff,
+  parentHello,
+  parentOffer,
+  money,
+  care,
+  results,
+  permission,
+  pin,
+  parentReady,
+  childReady,
 }
 
 class OnboardingController extends ChangeNotifier {
   OnboardingController(GameServices game)
-      : _game = game, _flow = OnboardingFlowService(game);
+    : _game = game,
+      _flow = OnboardingFlowService(game);
   final GameServices _game;
   final OnboardingFlowService _flow;
   bool? completed;
@@ -26,23 +47,29 @@ class OnboardingController extends ChangeNotifier {
   static const skinIds = ['gray', 'orange', 'cream'];
   String get skinId => skinIds[skinIndex];
   bool get canGoBack => !busy && !_pinAccepted && step != OnboardingStep.intro;
-  bool get canContinue => !busy && switch (step) {
-    OnboardingStep.childName => childName.trim().isNotEmpty,
-    OnboardingStep.petName => petName.trim().isNotEmpty,
-    OnboardingStep.pin || OnboardingStep.permission => false,
-    _ => true,
-  };
-  void _changed() { if (!_disposed) notifyListeners(); }
+  bool get canContinue =>
+      !busy &&
+      switch (step) {
+        OnboardingStep.childName => childName.trim().isNotEmpty,
+        OnboardingStep.petName => petName.trim().isNotEmpty,
+        OnboardingStep.pin || OnboardingStep.permission => false,
+        _ => true,
+      };
+  void _changed() {
+    if (!_disposed) notifyListeners();
+  }
 
   Future<void> load() async {
     if (busy) return;
     busy = true;
     error = null;
     _changed();
-    final result = await _game.context.run((r) async => (
-      (await r.profiles.profile())?.onboardingCompleted == true,
-      (await r.parents.parentSettings()).hasPin,
-    ));
+    final result = await _game.context.run(
+      (r) async => (
+        (await r.profiles.profile())?.onboardingCompleted == true,
+        (await r.parents.parentSettings()).hasPin,
+      ),
+    );
     if (_disposed) return;
     busy = false;
     switch (result) {
@@ -55,13 +82,28 @@ class OnboardingController extends ChangeNotifier {
     _changed();
   }
 
-  void setChildName(String value) { if (!busy) { childName = value; error = null; _changed(); } }
-  void setPetName(String value) { if (!busy) { petName = value; error = null; _changed(); } }
+  void setChildName(String value) {
+    if (!busy) {
+      childName = value;
+      error = null;
+      _changed();
+    }
+  }
+
+  void setPetName(String value) {
+    if (!busy) {
+      petName = value;
+      error = null;
+      _changed();
+    }
+  }
+
   void changeSkin(int delta) {
     if (busy || step != OnboardingStep.skin) return;
     skinIndex = (skinIndex + delta) % skinIds.length;
     _changed();
   }
+
   void next() {
     if (!canContinue || completed == true) return;
     if (step == OnboardingStep.childReady) return;
@@ -71,6 +113,7 @@ class OnboardingController extends ChangeNotifier {
     error = null;
     _changed();
   }
+
   void back() {
     if (!canGoBack) return;
     parentConsent = false;
@@ -78,6 +121,7 @@ class OnboardingController extends ChangeNotifier {
     step = OnboardingStep.values[step.index - 1];
     _changed();
   }
+
   void explainAgain() {
     if (busy || _pinAccepted) return;
     parentConsent = false;
@@ -85,6 +129,7 @@ class OnboardingController extends ChangeNotifier {
     error = null;
     _changed();
   }
+
   void decline() {
     if (busy || _pinAccepted) return;
     parentConsent = false;
@@ -92,8 +137,13 @@ class OnboardingController extends ChangeNotifier {
     error = null;
     _changed();
   }
+
   void consent() {
-    if (busy || (step != OnboardingStep.permission && step != OnboardingStep.parentOffer)) return;
+    if (busy ||
+        (step != OnboardingStep.permission &&
+            step != OnboardingStep.parentOffer)) {
+      return;
+    }
     parentConsent = true;
     step = OnboardingStep.pin;
     error = null;
@@ -132,16 +182,26 @@ class OnboardingController extends ChangeNotifier {
     busy = true;
     error = null;
     _changed();
-    final result = await _flow.complete(childName: childName, petName: petName,
-      skinId: skinId, parentConsent: parentConsent);
+    final result = await _flow.complete(
+      childName: childName,
+      petName: petName,
+      skinId: skinId,
+      parentConsent: parentConsent,
+    );
     if (_disposed) return;
     busy = false;
     switch (result) {
-      case Success(): completed = true;
-      case Rejected(): error = 'Не получилось сохранить игру. Попробуй ещё раз.';
+      case Success():
+        completed = true;
+      case Rejected():
+        error = 'Не получилось сохранить игру. Попробуй ещё раз.';
     }
     _changed();
   }
+
   @override
-  void dispose() { _disposed = true; super.dispose(); }
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
 }

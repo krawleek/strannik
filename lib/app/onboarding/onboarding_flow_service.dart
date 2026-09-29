@@ -10,9 +10,8 @@ class OnboardingFlowService {
   final GameServices game;
   bool _parentVerified = false;
 
-  Future<Result<bool>> hasPin() => game.context.run(
-    (r) async => (await r.parents.parentSettings()).hasPin,
-  );
+  Future<Result<bool>> hasPin() =>
+      game.context.run((r) async => (await r.parents.parentSettings()).hasPin);
 
   Future<Result<void>> acceptPin(String pin) async {
     final existing = await hasPin();
@@ -35,12 +34,14 @@ class OnboardingFlowService {
     require(parentConsent && _parentVerified, Failure.unauthorized);
     require((await r.parents.parentSettings()).hasPin, Failure.unauthorized);
     final context = game.context;
-    final onboarding = OnboardingService(GameContext(
-      unitOfWork: _TransactionScope(r),
-      content: context.content,
-      clock: context.clock,
-      ids: context.ids,
-    ));
+    final onboarding = OnboardingService(
+      GameContext(
+        unitOfWork: _TransactionScope(r),
+        content: context.content,
+        clock: context.clock,
+        ids: context.ids,
+      ),
+    );
     await onboarding.saveDraft(
       nickname: childName.trim(),
       avatarId: 'girl',

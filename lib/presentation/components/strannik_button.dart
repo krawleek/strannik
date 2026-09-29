@@ -9,10 +9,15 @@ class StrannikButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.secondary = false,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.child,
   });
   final String label;
   final VoidCallback? onPressed;
   final bool secondary;
+  final Color? backgroundColor, foregroundColor;
+  final Widget? child;
   @override
   Widget build(BuildContext context) => StrannikTapTarget(
     label: label,
@@ -30,18 +35,21 @@ class StrannikButton extends StatelessWidget {
           ),
           color: onPressed == null
               ? AppColors.gray
-              : secondary
-              ? AppColors.yellow
-              : AppColors.green,
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: AppTypography.button.copyWith(
-              color: secondary || onPressed == null
-                  ? AppColors.blue
-                  : AppColors.white,
-            ),
-          ),
+              : backgroundColor ??
+                    (secondary ? AppColors.yellow : AppColors.green),
+          child:
+              child ??
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: AppTypography.button.copyWith(
+                  color:
+                      foregroundColor ??
+                      (secondary || onPressed == null
+                          ? AppColors.blue
+                          : AppColors.white),
+                ),
+              ),
         ),
       ),
     ),

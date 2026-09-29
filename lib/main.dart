@@ -49,7 +49,10 @@ class _StartupState extends State<_Startup> {
     future: _opening,
     builder: (context, snapshot) {
       if (snapshot.hasData) {
-        return StrannikApp(controller: snapshot.data!.controller);
+        return StrannikApp(
+          controller: snapshot.data!.controller,
+          onboarding: snapshot.data!.onboarding,
+        );
       }
       return MaterialApp(
         debugShowCheckedModeBanner: false,

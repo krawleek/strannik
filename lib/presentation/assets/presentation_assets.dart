@@ -17,7 +17,11 @@ abstract final class PresentationAssets {
   static const bank = 'assets/icons/nav_bank.png';
   static const learning = 'assets/icons/nav_learning.png';
 
-  static const _skins = {'orange': orangeCat};
+  static const _skins = {
+    'orange': orangeCat,
+    'gray': 'assets/onboarding/skin_gray.png',
+    'cream': 'assets/onboarding/skin_cream.png',
+  };
   static const _avatars = {'girl': girlAvatar};
   // No approved accessory artwork yet. The bag is an explicit item thumbnail,
   // never drawn as if it were the actual accessory worn by the cat.

@@ -64,6 +64,7 @@ flutter:
     - assets/backgrounds/
     - assets/illustrations/
     - assets/icons/
+    - assets/onboarding/
     - lib/content/seed/development.json
   fonts:
     - family: Manrope
