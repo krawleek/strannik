@@ -23,6 +23,26 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  test(
+    'database configuration keeps secure deletion and foreign keys enabled',
+    () async {
+      expect(
+        (await h.db.database.rawQuery('PRAGMA secure_delete'))
+            .single
+            .values
+            .single,
+        1,
+      );
+      expect(
+        (await h.db.database.rawQuery('PRAGMA foreign_keys'))
+            .single
+            .values
+            .single,
+        1,
+      );
+    },
+  );
+
   test('all state survives closing and reopening SQLite', () async {
     await h.unlockSavings();
     success(await h.game.savings.createSavingsGoal('Цель', 100));

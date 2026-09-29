@@ -21,7 +21,8 @@ class LocalDatabase implements UnitOfWork {
         version: schemaVersion,
         onConfigure: (db) async {
           await db.execute('PRAGMA foreign_keys = ON');
-          await db.execute('PRAGMA secure_delete = ON');
+          // This PRAGMA returns a row; Android rejects it through execute().
+          await db.rawQuery('PRAGMA secure_delete = ON');
         },
         onCreate: (db, version) => migrate(db, 0, version),
         onUpgrade: migrate,
