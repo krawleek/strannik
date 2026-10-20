@@ -73,7 +73,7 @@ class _LearningScreenState extends State<LearningScreen> {
       if (result is Success<LearningTopicProgress>) {
         finale = result.value;
       } else {
-        error = 'Сначала заверши все задания темы.';
+        error = 'Не удалось открыть финал. Попробуй ещё раз.';
       }
     });
     await load();

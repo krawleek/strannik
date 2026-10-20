@@ -68,6 +68,7 @@ Created:
 - `test/domain/financial_safety_topic_test.dart`
 - `test/presentation/financial_safety_topic_widget_test.dart`
 - `integration_test/stage3_complete_journey_test.dart`
+- `integration_test/financial_safety_restart_test.dart` (separate Android-process verification of the completed QA save)
 - `assets/learning/safety_{finale_cat,celebration_star,detective,story_cat,locked,map_call,map_email,guide_bubble}.png`
 
 Updated:
@@ -90,14 +91,18 @@ Updated:
 
 - `dart format .`: run successfully; final verification recorded below.
 - `flutter analyze`: no issues at the latest completed analysis; final verification recorded below.
-- `flutter build apk --debug`: succeeded.
+- `flutter build apk --debug`: final standalone build succeeded after all integration runs (14.1s), using ordinary `lib/main.dart`. APK: `build/app/outputs/flutter-apk/app-debug.apk`.
 - Stage 3 targeted domain/widget tests passed, including both existing lessons, full guide, gated finale and resume/replay. Topic migration/rollback suite: 5 tests passed, including nonempty saved plan, savings and inventory preservation.
 - Android Stage 3 UI run: **passed**, `emulator-5562`, both lessons with wrong-answer recovery, full guide, both finale scenes, SQLite reopen, both replays. Final isolated wallet **610**, XP **60**. Log: `/tmp/stage3-android-qa.log`; screenshots: `build/safety-qa/android-topic/`.
 - Topic UI screenshots at 360 and 320 logical width: `build/safety-qa/topic/`. Manrope and MaterialIcons are loaded for visual QA. Original illustration assets, scrolling and system insets verified.
 
 Final full suite: **160 tests passed** (`/tmp/stage3-final-all-tests.log`). `flutter analyze`: **No issues found**. `dart format .`: completed successfully. The first full-suite attempts exposed old fixture/async failures, then a concurrent Android build temporarily removed the macOS SQLite native asset. After repairing fixtures and running the suite after Android compilation, all checks passed. No production behavior or tests were removed to suppress failures.
 
-Complete new-player Android journey remains under verification; results follow below.
+Complete new-player Android journey: **PASSED** in 8m34s (latest repeat; preceding run also passed in 8m48s) on isolated `Stage3Acceptance`, Android 360×800 logical pixels, separate ADB server. Real UI input and basket gestures, no seeded stage/completion/economy or controller-dispatched progression. Covered onboarding including parent PIN, all three Stage 1 lessons with wrong-answer recovery, real goal and Bank allocation, Store purchases and toy XP, both stage transitions, both Stage 2 lessons including 10/10 discount catches, both safety investigations, guide, both finale scenes, return Home and SQLite/UI reconstruction. Log: `/tmp/stage3-full-journey.log`; screenshots: `build/safety-qa/android-full-journey/`. Ordinary UI returns replaced fixed-count Android back presses in the test harness.
+
+A separate new-process verification uses a QA-only copy made after closing SQLite at the final restored-Home checkpoint. The test runner retains the QA app between invocations (`--keep-app-running`); the default Flutter driver uninstalls it and deletes its data after a run. **PASSED** in a new Android process (journey PID 22406 → restart PID 27464): Stage 3 Home and 2/2 map restored, acknowledged finale replayed, wallet **783 фир**, XP **102**, money transaction count unchanged, one topic reward operation. Wallet also equals the sum of the persisted ledger. Log: `/tmp/stage3-process-restart.log`; screenshot: `build/safety-qa/android-topic/process-restart-home.png`. The QA-only copied database is removed after verification. The temporary Stage3Acceptance emulator was stopped after QA. Reproduce by running `flutter drive --driver=test_driver/profile_driver.dart --target=integration_test/stage3_complete_journey_test.dart -d <device> --keep-app-running`, then the same command with target `integration_test/financial_safety_restart_test.dart` on the same device.
+
+Android screenshots verify the reference 360×800 viewport. The older `font130`, `dark` and `narrow` capture markers in the safety-only test were not applied by the host capture runner, so those filenames do not establish Android setting-variant coverage. Narrow 320-wide layout coverage is from the actual widget tests.
 
 ## 11. Remaining design blockers
 
@@ -105,4 +110,4 @@ Complete new-player Android journey remains under verification; results follow b
 
 ## 12. Is Stage 3 fully playable?
 
-The published **two-investigation financial-safety topic** is playable through ordinary application navigation, with reference guide, topic finale and persistent one-time rewards. The separate undefined mother concept is not playable and is not reported complete. Full cross-stage Android acceptance results are recorded below after verification.
+The published **two-investigation financial-safety topic** is playable through ordinary application navigation, with reference guide, topic finale and persistent one-time rewards. The separate undefined mother concept is not playable and is not reported complete. The complete ordinary-UI cross-stage journey also passed. A separate new-process Android verification also passed, preserving wallet, XP and one-time topic rewards.

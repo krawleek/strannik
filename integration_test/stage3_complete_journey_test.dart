@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -275,10 +277,13 @@ void main() {
       await tap(find.bySemanticsLabel(RegExp('^Мяч\\.')));
       await tap(find.text('Поиграть'));
       await capture('20-earned-xp');
-      // Android back clears selected item, closes Closet, then returns Home.
-      for (var i = 0; i < 3; i++) {
-        await t.binding.handlePopRoute();
-        await settle();
+      // Visible navigation clears the item, closes Closet and returns Home.
+      for (
+        var i = 0;
+        i < 5 && find.byType(StoreScreen).evaluate().isNotEmpty;
+        i++
+      ) {
+        await tap(find.bySemanticsLabel('Назад'));
       }
       await tap(find.bySemanticsLabel(RegExp('^Стадия 1')));
       await wait(find.text('Перейти на стадию 2'));
@@ -358,9 +363,12 @@ void main() {
       await buy('Титан');
       await buy('Титан');
       await buy('Топливо');
-      for (var i = 0; i < 2; i++) {
-        await t.binding.handlePopRoute();
-        await settle();
+      for (
+        var i = 0;
+        i < 5 && find.byType(StoreScreen).evaluate().isNotEmpty;
+        i++
+      ) {
+        await tap(find.bySemanticsLabel('Назад'));
       }
       await tap(find.bySemanticsLabel(RegExp('^Стадия 2')));
       await tap(find.text('Перейти на стадию 3'));
@@ -451,6 +459,9 @@ void main() {
       store.dispose();
       onboarding.dispose();
       await db.close();
+      await File(path)
+          .copy('${await getDatabasesPath()}/safety_acceptance_restart.db');
+      debugPrint('STAGE3_QA_SAVE_READY');
       await deleteDatabase(path);
       expect(t.takeException(), isNull);
     },
