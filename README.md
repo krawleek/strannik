@@ -11,13 +11,6 @@
 <table>
   <tr>
     <td align="center"><img src="screenshots/home.png" width="220" alt="Дом: питомец, стадия и навигация"><br>Дом · Android</td>
-    <td align="center"><img src="screenshots/bank.png" width="220" alt="Банк: баланс, Нужно, Хочу, Коплю"><br>Банк · widget-тест</td>
-    <td align="center"><img src="screenshots/learning.png" width="220" alt="Карта заданий третьей стадии"><br>Обучение · Android</td>
-  </tr>
-  <tr>
-    <td align="center"><img src="screenshots/minigame.png" width="220" alt="Ловушки скидок: товары и корзина"><br>Мини-игра · widget-тест</td>
-    <td align="center"><img src="screenshots/financial-safety.png" width="220" alt="Секретный звонок: выбор безопасного действия"><br>Финансовая безопасность · Android</td>
-    <td align="center">Магазин и шкаф реализованы.<br>Полный Android-снимок ещё нужно добавить.</td>
   </tr>
 </table>
 
