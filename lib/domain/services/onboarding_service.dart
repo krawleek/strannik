@@ -62,7 +62,7 @@ class OnboardingService {
     );
     await game.money(
       r,
-      amount: 100,
+      amount: game.content.economy.startingBalance,
       type: TransactionType.initialGrant,
       source: TransactionSource.onboarding,
       key: 'initialGrant',

@@ -32,15 +32,34 @@ class HomeController extends ChangeNotifier {
     if (_state.busy) return;
     final version = ++_loadVersion;
     _publish(const HomeViewState());
-    final result = await unitOfWork.run(
-      (r) async => HomeSnapshot(
+    final result = await unitOfWork.run((r) async {
+      final pet = await r.pets.pet();
+      final app = await r.system.appState();
+      final tasks =
+          content?.tasks
+              .where(
+                (t) =>
+                    t.enabled &&
+                    t.stage ==
+                        (pet == null ? Stage.earth : app.effectiveStage(pet)) &&
+                    t.rewardPolicy == RewardPolicy.oneTime,
+              )
+              .toList() ??
+          [];
+      var completed = 0;
+      for (final task in tasks) {
+        if ((await r.learning.learningProgress(task.id)).completed) completed++;
+      }
+      return HomeSnapshot(
         profile: await r.profiles.profile(),
         pet: await r.pets.pet(),
         appState: await r.system.appState(),
         inventory: List.unmodifiable(await r.items.inventory()),
         period: await r.progress.currentPeriod(),
-      ),
-    );
+        completedLessons: completed,
+        requiredLessons: content == null ? 3 : tasks.length,
+      );
+    });
     if (_disposed || version != _loadVersion) return;
     switch (result) {
       case Rejected():

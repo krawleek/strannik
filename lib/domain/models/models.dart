@@ -4,7 +4,7 @@ enum Stage { earth, space, homePlanet }
 
 enum EmotionalState { neutral, happy, thoughtful }
 
-enum BigGoalType { repairShip, contactHome, adaptOnEarth }
+enum BigGoalType { repairShip, contactHome, spaceTaxi }
 
 enum ItemCategory { accessory, treat, toy, shipMaterial }
 
@@ -23,7 +23,14 @@ enum TransactionType {
   savingsWithdrawal,
 }
 
-enum TransactionSource { onboarding, learning, parentReward, store, savings }
+enum TransactionSource {
+  onboarding,
+  learning,
+  parentReward,
+  store,
+  savings,
+  financialGoal,
+}
 
 enum FinancialDirection { income, expense, internalTransfer }
 
@@ -41,6 +48,7 @@ enum ProgressEventType {
   materialUsed,
   stageChanged,
   bigGoalConfirmed,
+  financialGoalCompleted,
 }
 
 class ChildProfile {
@@ -54,14 +62,17 @@ class ChildProfile {
   final String id, nickname, avatarId;
   final bool onboardingCompleted;
   final DateTime createdAt;
-  ChildProfile copyWith({String? nickname, bool? onboardingCompleted}) =>
-      ChildProfile(
-        id: id,
-        nickname: nickname ?? this.nickname,
-        avatarId: avatarId,
-        onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
-        createdAt: createdAt,
-      );
+  ChildProfile copyWith({
+    String? nickname,
+    String? avatarId,
+    bool? onboardingCompleted,
+  }) => ChildProfile(
+    id: id,
+    nickname: nickname ?? this.nickname,
+    avatarId: avatarId ?? this.avatarId,
+    onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+    createdAt: createdAt,
+  );
 }
 
 class PinCredential {
@@ -157,9 +168,11 @@ class BudgetAllocation {
 }
 
 class BigGoal {
-  const BigGoal(this.type, {this.confirmedAt});
+  const BigGoal(this.type, {this.confirmedAt, this.completedAt});
   final BigGoalType type;
   final DateTime? confirmedAt;
+  final DateTime? completedAt;
+  bool get isCompleted => completedAt != null;
   bool get isConfirmed => confirmedAt != null;
 }
 
@@ -312,9 +325,41 @@ class LearningTheme {
     required this.id,
     required this.title,
     required this.order,
+    this.stage = Stage.earth,
   });
   final String id, title;
   final int order;
+  final Stage stage;
+}
+
+class LessonProduct {
+  const LessonProduct({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.assetId,
+  });
+  final String id, title, assetId;
+  final int price;
+}
+
+/// Simulated budget only. Never reads or writes the player's wallet/inventory.
+class LessonBudget {
+  LessonBudget(this.limit, this.products, Iterable<String> selected)
+    : selected = Set.unmodifiable(selected);
+  final int limit;
+  final List<LessonProduct> products;
+  final Set<String> selected;
+  int get total => products
+      .where((p) => selected.contains(p.id))
+      .fold(0, (sum, p) => sum + p.price);
+  int get remaining => limit - total;
+  int get shortfall => remaining < 0 ? -remaining : 0;
+  bool get valid =>
+      selected.isNotEmpty &&
+      selected.every((id) => products.any((p) => p.id == id)) &&
+      total > 0 &&
+      total <= limit;
 }
 
 class LearningTask {
@@ -326,13 +371,27 @@ class LearningTask {
     required this.rewardFira,
     required this.order,
     required this.contentReference,
+    this.stage = Stage.earth,
+    this.description = '',
+    this.implemented = true,
+    this.enabled = true,
+    this.rewardXp = 0,
+    this.exerciseBudget = 0,
+    this.products = const [],
     this.rewardPolicy = RewardPolicy.oneTime,
     this.repeatRule = RepeatRule.newCompletedAttempt,
   }) {
     validAmount(rewardFira, allowZero: true);
+    validAmount(rewardXp, allowZero: true);
   }
-  final String id, themeId, title, type, contentReference;
-  final int rewardFira, order;
+  final String id, themeId, title, type, contentReference, description;
+  final Stage stage;
+  final bool implemented;
+
+  /// Disabled lessons retain their IDs but do not gate published curriculum.
+  final bool enabled;
+  final int rewardFira, rewardXp, order, exerciseBudget;
+  final List<LessonProduct> products;
   final RewardPolicy rewardPolicy;
   final RepeatRule repeatRule;
 }
@@ -349,13 +408,30 @@ class LearningProgress {
   bool get completed => completionCount > 0;
 }
 
+/// Persisted separately from individual lesson rewards and attempts.
+class LearningTopicProgress {
+  const LearningTopicProgress({
+    required this.topicId,
+    this.completedAt,
+    this.finaleStep = 0,
+  });
+  final String topicId;
+  final DateTime? completedAt;
+
+  /// 0: reward, 1: story, 2: story acknowledged.
+  final int finaleStep;
+  bool get completed => completedAt != null;
+}
+
 class LearningAttempt {
   const LearningAttempt({
     required this.id,
     required this.taskId,
     required this.startedAt,
     this.completedAt,
+    this.lessonState = const {},
   });
+  final Map<String, Object?> lessonState;
   final String id, taskId;
   final DateTime startedAt;
   final DateTime? completedAt;

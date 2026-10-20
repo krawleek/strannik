@@ -10,12 +10,15 @@ class HomeSnapshot {
     required this.appState,
     required this.inventory,
     required this.period,
+    this.completedLessons = 0,
+    this.requiredLessons = 3,
   });
   final ChildProfile? profile;
   final Pet? pet;
   final AppState appState;
   final List<InventoryEntry> inventory;
   final GamePeriod? period;
+  final int completedLessons, requiredLessons;
 }
 
 class HomeViewState {

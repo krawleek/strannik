@@ -58,6 +58,29 @@ void main() {
     toStep(c, OnboardingStep.permission);
   }
 
+  test(
+    'Skip on each explanation opens PIN without finalizing gameplay',
+    () async {
+      for (final step in [
+        OnboardingStep.money,
+        OnboardingStep.care,
+        OnboardingStep.results,
+      ]) {
+        c.step = step;
+        c.parentConsent = false;
+        c.consent();
+        expect(c.step, OnboardingStep.pin);
+        expect(c.parentConsent, true);
+        expect((await h.read((r) => r.parents.parentSettings())).hasPin, false);
+        expect(await h.balance(), 0);
+        expect(await h.read((r) => r.profiles.profile()), isNull);
+        c.back();
+        expect(c.step, OnboardingStep.permission);
+        expect(c.parentConsent, false);
+      }
+    },
+  );
+
   test('declining consent creates no progress; PIN uses existing hash infrastructure', () async {
     await prepare();
     c.decline();

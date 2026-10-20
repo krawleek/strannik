@@ -39,6 +39,8 @@ dependencies:
   cryptography: ^2.9.0
 
 dev_dependencies:
+  integration_test:
+    sdk: flutter
   flutter_test:
     sdk: flutter
 
@@ -65,6 +67,12 @@ flutter:
     - assets/illustrations/
     - assets/icons/
     - assets/onboarding/
+    - assets/learning/
+    - assets/profile/
+    - assets/store/
+    - assets/bank/
+    - assets/earth/
+    - assets/stages/
     - lib/content/seed/development.json
   fonts:
     - family: Manrope

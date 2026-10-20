@@ -62,10 +62,20 @@ class PeriodService {
   /// Called inside learning's transaction, after the final reward is recorded.
   Future<void> advanceCompletedThemes(Repositories r) async {
     var current = await game.period(r);
-    final themes = [...game.content.themes]
+    final themes = [...game.content.themes.where((t) => t.stage == Stage.earth)]
       ..sort((a, b) => a.order.compareTo(b.order));
     while (current.kind != PeriodKind.afterFraudTheme &&
-        await game.themeCompleted(r, themes[current.kind.index].id)) {
+        current.kind.index < themes.length) {
+      final theme = themes[current.kind.index];
+      final required = game.content.tasks.where(
+        (t) =>
+            t.themeId == theme.id &&
+            t.enabled &&
+            t.rewardPolicy == RewardPolicy.oneTime,
+      );
+      // A reassigned task leaves no requirement in its former topic. Skip the
+      // empty checkpoint without creating completion or reward records.
+      if (required.isNotEmpty && !await game.themeCompleted(r, theme.id)) break;
       final now = game.clock.now();
       await r.progress.savePeriodSummary(await _calculate(r, current));
       await r.progress.savePeriod(

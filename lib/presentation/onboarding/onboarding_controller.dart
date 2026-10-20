@@ -141,7 +141,10 @@ class OnboardingController extends ChangeNotifier {
   void consent() {
     if (busy ||
         (step != OnboardingStep.permission &&
-            step != OnboardingStep.parentOffer)) {
+            step != OnboardingStep.parentOffer &&
+            step != OnboardingStep.money &&
+            step != OnboardingStep.care &&
+            step != OnboardingStep.results)) {
       return;
     }
     parentConsent = true;
@@ -169,7 +172,7 @@ class OnboardingController extends ChangeNotifier {
         step = OnboardingStep.parentReady;
       case Rejected(reason: final reason):
         error = switch (reason) {
-          Failure.pinLocked => 'Слишком много попыток. Подождите 30 секунд.',
+          Failure.pinLocked => 'Слишком много попыток. Подождите 5 минут.',
           Failure.invalidPin => 'PIN не подошёл. Попробуйте ещё раз.',
           _ => 'Не получилось сохранить PIN. Попробуйте ещё раз.',
         };

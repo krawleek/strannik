@@ -52,6 +52,8 @@ class _StartupState extends State<_Startup> {
         return StrannikApp(
           controller: snapshot.data!.controller,
           onboarding: snapshot.data!.onboarding,
+          profile: snapshot.data!.profile,
+          store: snapshot.data!.store,
         );
       }
       return MaterialApp(

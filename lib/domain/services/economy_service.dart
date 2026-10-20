@@ -1,5 +1,6 @@
 import '../../core/result.dart';
 import '../models/models.dart';
+import '../models/budget_category.dart';
 import 'game_context.dart';
 import 'parent_access_service.dart';
 
@@ -17,6 +18,21 @@ class EconomyService {
           source: TransactionSource.parentReward,
         );
       });
+  Future<Result<void>> rewardInSession(
+    Object? token,
+    int amount,
+    String operationId,
+  ) => parentAccess.authorized(token, (r) async {
+    validAmount(amount);
+    require(operationId.isNotEmpty, Failure.invalidState);
+    await game.money(
+      r,
+      amount: amount,
+      type: TransactionType.parentReward,
+      source: TransactionSource.parentReward,
+      key: 'parent:$operationId',
+    );
+  });
   Future<Result<void>> allocateBudget({
     required int mandatory,
     required int optional,
@@ -33,5 +49,22 @@ class EconomyService {
       Failure.insufficientFunds,
     );
     await r.economy.saveBudget(plan);
+  });
+
+  /// Re-read and change the plan in one transaction; never move actual money.
+  Future<Result<void>> reallocateBudget({
+    required BudgetCategory source,
+    required BudgetCategory destination,
+    required int amount,
+  }) => game.run((r) async {
+    await game.period(r);
+    final plan = await r.economy.budget();
+    require(plan != null, Failure.notFound);
+    final updated = plan!.reallocate(source, destination, amount);
+    require(
+      updated.total <= (await r.economy.wallet()).firaAmount,
+      Failure.insufficientFunds,
+    );
+    await r.economy.saveBudget(updated);
   });
 }

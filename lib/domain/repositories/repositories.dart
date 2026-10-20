@@ -1,4 +1,5 @@
 import '../../core/result.dart';
+import '../../content/economy_config.dart';
 import '../models/models.dart';
 
 abstract interface class ProfileRepository {
@@ -35,6 +36,8 @@ abstract interface class InventoryRepository {
 }
 
 abstract interface class LearningRepository {
+  Future<LearningTopicProgress> topicProgress(String topicId);
+  Future<void> saveTopicProgress(LearningTopicProgress value);
   Future<LearningProgress> learningProgress(String taskId);
   Future<void> saveLearningProgress(LearningProgress value);
   Future<LearningAttempt?> attempt(String id);
@@ -82,6 +85,7 @@ abstract interface class UnitOfWork {
 }
 
 abstract interface class ContentRepository {
+  EconomyRules get economy;
   List<StoreItem> get storeItems;
   List<ResourceDefinition> get resources;
   List<LearningTheme> get themes;

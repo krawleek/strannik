@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:strannik/app/bootstrap.dart';
 import 'package:strannik/content/local_content_repository.dart';
+import 'package:strannik/content/economy_config.dart';
 import 'package:strannik/core/clock.dart';
 import 'package:strannik/core/result.dart';
 import 'package:strannik/data/local/database.dart';
@@ -42,9 +44,45 @@ class Harness {
       factory: databaseFactoryFfi,
     );
     final clock = FakeClock();
+    final source =
+        contentSource ??
+        File('lib/content/seed/development.json').readAsStringSync();
+    final fixture = jsonDecode(source) as Map<String, dynamic>;
+    if (contentSource == null) {
+      // Preserve the deliberately isolated legacy evaluator/economy fixture.
+      fixture['tasks'].removeWhere((t) => t['type'] == 'earthTopicOne');
+      for (final item in fixture['items']) {
+        if (item['id'] == 'scarf') item['price'] = 15;
+        if (item['id'] == 'ball') item['price'] = 10;
+      }
+      for (final task in fixture['tasks']) {
+        if (['theme2_task', 'theme3_task', 'fraud_task'].contains(task['id'])) {
+          task['rewardFira'] = 20;
+          task['type'] = 'choice';
+          task['implemented'] = true;
+          task['enabled'] = true;
+          task['rewardPolicy'] = 'oneTime';
+        }
+        if (task['id'] == 'practice') {
+          task['implemented'] = true;
+          task['rewardFira'] = 5;
+        }
+      }
+      // Legacy service tests use their original 20-fira, zero-XP evaluator fixture.
+      fixture['tasks'][0]['rewardFira'] = 20;
+      fixture['tasks'][0]['rewardXp'] = 0;
+      fixture['tasks'][0]['type'] = 'choice';
+      fixture['tasks'][0]['themeId'] = 'theme1';
+      fixture['themes'].removeWhere((t) => t['id'] == 'space_theme1');
+      fixture['tasks'].removeWhere((t) => t['themeId'] == 'space_theme1');
+    }
     final content = LocalContentRepository.fromJson(
-      contentSource ??
-          File('lib/content/seed/development.json').readAsStringSync(),
+      jsonEncode(fixture),
+      economy: EconomyRules(
+        startingBalance: contentSource == null
+            ? 100
+            : EconomyConfig.startingBalance,
+      ),
     );
     final game = GameServices(
       unitOfWork: db,

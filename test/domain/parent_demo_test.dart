@@ -11,16 +11,16 @@ void main() {
     await h.start();
   });
   tearDown(() => h.db.close());
-  test('PIN hash salted, fifth failed attempt locks 30 seconds', () async {
+  test('PIN hash salted, third failed attempt locks five minutes', () async {
     final settings = await h.read((r) => r.parents.parentSettings());
     expect(settings.credential!.hash, isNot('1234'));
     expect(settings.credential!.salt, isNotEmpty);
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 2; i++) {
       rejected(await h.game.parentAccess.verifyPin('0000'), Failure.invalidPin);
     }
     rejected(await h.game.parentAccess.verifyPin('0000'), Failure.pinLocked);
     rejected(await h.game.parentAccess.verifyPin('1234'), Failure.pinLocked);
-    h.clock.advance(const Duration(seconds: 29));
+    h.clock.advance(const Duration(seconds: 299));
     rejected(await h.game.parentAccess.verifyPin('1234'), Failure.pinLocked);
     h.clock.advance(const Duration(seconds: 1));
     success(await h.game.parentAccess.verifyPin('1234'));

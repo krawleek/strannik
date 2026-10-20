@@ -12,12 +12,14 @@ class StrannikButton extends StatelessWidget {
     this.backgroundColor,
     this.foregroundColor,
     this.child,
+    this.minimumHeight = 56,
   });
   final String label;
   final VoidCallback? onPressed;
   final bool secondary;
   final Color? backgroundColor, foregroundColor;
   final Widget? child;
+  final double minimumHeight;
   @override
   Widget build(BuildContext context) => StrannikTapTarget(
     label: label,
@@ -27,11 +29,11 @@ class StrannikButton extends StatelessWidget {
       child: CustomPaint(
         foregroundPainter: const _ButtonBevel(),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 56),
+          constraints: BoxConstraints(minHeight: minimumHeight),
           alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: AppSpacing.buttonHorizontal,
-            vertical: AppSpacing.buttonVertical,
+            vertical: minimumHeight == 56 ? AppSpacing.buttonVertical : 14,
           ),
           color: onPressed == null
               ? AppColors.gray

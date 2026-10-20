@@ -2,6 +2,8 @@ import 'package:path/path.dart' as path;
 import 'package:sqflite/sqflite.dart' show getDatabasesPath;
 
 import 'feedback/feedback_services.dart';
+import 'feedback/platform_feedback.dart';
+import '../domain/services/profile_service.dart';
 import '../data/repositories/sqlite_feedback_settings_store.dart';
 import '../core/clock.dart';
 import '../data/local/database.dart';
@@ -44,6 +46,7 @@ class GameServices {
     progression = ProgressionService(context);
     demo = DemoService(parentAccess);
     localData = LocalDataService(parentAccess);
+    profile = ProfileService(context, parentAccess);
   }
   late final GameContext context;
   late final ParentAccessService parentAccess;
@@ -57,11 +60,22 @@ class GameServices {
   late final ProgressionService progression;
   late final DemoService demo;
   late final LocalDataService localData;
+  late final ProfileService profile;
 }
 
 Future<LocalDatabase> openGameDatabase() async =>
     LocalDatabase.open(path.join(await getDatabasesPath(), 'strannik.db'));
 
 /// Uses the same open local database; no player, assets or network initialized.
-FeedbackServices createFeedbackServices(LocalDatabase database) =>
-    FeedbackServices(store: SqliteFeedbackSettingsStore(database.database));
+FeedbackServices createFeedbackServices(
+  LocalDatabase database, {
+  bool platformOutputs = false,
+}) => FeedbackServices(
+  store: SqliteFeedbackSettingsStore(database.database),
+  sfxOutput: platformOutputs
+      ? const PlatformSfxOutput()
+      : const NoOpSfxOutput(),
+  hapticsOutput: platformOutputs
+      ? const PlatformHapticsOutput()
+      : const NoOpHapticsOutput(),
+);

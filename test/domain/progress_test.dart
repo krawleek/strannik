@@ -49,7 +49,7 @@ void main() {
     success(await h.game.progression.selectBigGoal(BigGoalType.repairShip));
     success(await h.game.progression.confirmBigGoal());
     rejected(
-      await h.game.progression.selectBigGoal(BigGoalType.adaptOnEarth),
+      await h.game.progression.selectBigGoal(BigGoalType.spaceTaxi),
       Failure.immutableSelection,
     );
     success(await h.game.store.buyItem('ball'));

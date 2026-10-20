@@ -2,20 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../foundation/app_tokens.dart';
+import '../foundation/feedback_scope.dart';
 import '../home/home_controller.dart';
 import 'app_shell.dart';
+import '../profile/profile_controller.dart';
+import '../store/store_controller.dart';
 import '../onboarding/onboarding_controller.dart';
 import '../onboarding/onboarding_flow.dart';
 import '../components/strannik_button.dart';
 
 class StrannikApp extends StatelessWidget {
-  const StrannikApp({super.key, required this.controller, this.onboarding});
+  const StrannikApp({
+    super.key,
+    required this.controller,
+    this.onboarding,
+    this.profile,
+    this.store,
+  });
   final HomeController controller;
+  final ProfileController? profile;
+  final StoreController? store;
   final OnboardingController? onboarding;
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
     title: 'Странник',
+    builder: (context, child) => profile == null
+        ? child!
+        : FeedbackScope(services: profile!.feedback, child: child!),
     theme: ThemeData(
       fontFamily: AppTypography.family,
       scaffoldBackgroundColor: AppColors.yellow,
@@ -75,6 +89,14 @@ class StrannikApp extends StatelessWidget {
   );
   Widget _home() => ListenableBuilder(
     listenable: controller,
-    builder: (_, _) => AppShell(controller: controller),
+    builder: (_, _) => AppShell(
+      controller: controller,
+      profile: profile,
+      store: store,
+      onReset: () async {
+        await onboarding?.load();
+        await controller.load();
+      },
+    ),
   );
 }

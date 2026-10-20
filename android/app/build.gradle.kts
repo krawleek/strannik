@@ -4,6 +4,39 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Keep credentials outside Git. Environment values also support CI secret stores.
+val releaseProperties = java.util.Properties()
+val releasePropertiesFile = rootProject.file("key.properties")
+if (releasePropertiesFile.exists()) {
+    releasePropertiesFile.inputStream().use { releaseProperties.load(it) }
+}
+fun releaseValue(property: String, environment: String): String? =
+    System.getenv(environment)?.takeIf { it.isNotBlank() }
+        ?: releaseProperties.getProperty(property)?.takeIf { it.isNotBlank() }
+val releaseStore = releaseValue("storeFile", "STRANNIK_KEYSTORE_PATH")
+val releaseStorePassword = releaseValue("storePassword", "STRANNIK_KEYSTORE_PASSWORD")
+val releaseAlias = releaseValue("keyAlias", "STRANNIK_KEY_ALIAS")
+val releaseKeyPassword = releaseValue("keyPassword", "STRANNIK_KEY_PASSWORD")
+val releaseSigningConfigured = listOf(
+    releaseStore, releaseStorePassword, releaseAlias, releaseKeyPassword
+).all { it != null }
+
+// Fail before packaging rather than silently producing a debug-signed release.
+val validateReleaseSigning by tasks.registering {
+    doLast {
+        check(releaseSigningConfigured) {
+            "Production signing is missing. Supply android/key.properties or STRANNIK_KEYSTORE_PATH, " +
+                "STRANNIK_KEYSTORE_PASSWORD, STRANNIK_KEY_ALIAS and STRANNIK_KEY_PASSWORD. " +
+                "See docs/RELEASE_READINESS.md."
+        }
+        check(rootProject.file(releaseStore!!).isFile) { "Production keystore file does not exist." }
+        check(releaseAlias != "androiddebugkey") { "The Android debug key cannot sign production releases." }
+    }
+}
+tasks.configureEach {
+    if (name == "preReleaseBuild") dependsOn(validateReleaseSigning)
+}
+
 android {
     namespace = "ru.strannik.strannik"
     compileSdk = flutter.compileSdkVersion
@@ -15,7 +48,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "ru.strannik.strannik"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -29,11 +61,20 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            create("production") {
+                storeFile = rootProject.file(releaseStore!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.findByName("production")
         }
     }
 }

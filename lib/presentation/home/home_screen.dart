@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../app/app_destination.dart';
 import '../assets/presentation_assets.dart';
 import '../components/strannik_button.dart';
+import '../components/pet_appearance.dart';
 import '../components/strannik_speech_bubble.dart';
 import '../components/strannik_stage_badge.dart';
 import '../components/strannik_tap_target.dart';
@@ -112,11 +113,7 @@ class _Scene extends StatelessWidget {
                 label: '$petName. Действия с питомцем',
                 expanded: state.actionsOpen,
                 onTap: state.busy ? null : controller.toggleActions,
-                child: Image.asset(
-                  petAsset.path,
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.high,
-                ),
+                child: PetAppearance(pet: pet),
               ),
             ),
             Align(
@@ -132,7 +129,10 @@ class _Scene extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 2),
                         child: StrannikStageBadge(
                           stageNumber: state.effectiveStage.index + 1,
-                          progressLabel: DevelopmentHomePreview.stageProgress,
+                          progressLabel: state.snapshot == null
+                              ? DevelopmentHomePreview.stageProgress
+                              : '${state.snapshot!.completedLessons}/${state.snapshot!.requiredLessons}',
+                          progressIsPlaceholder: state.snapshot == null,
                           onTap: () => onNavigate(AppDestination.stages),
                         ),
                       ),

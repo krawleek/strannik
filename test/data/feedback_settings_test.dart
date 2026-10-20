@@ -150,7 +150,7 @@ void main() {
       await old.close();
       h = await Harness.create(path: path);
       feedback = createFeedbackServices(h.db);
-      expect(await h.db.database.getVersion(), 2);
+      expect(await h.db.database.getVersion(), LocalDatabase.schemaVersion);
       expect(await h.balance(), 77);
       expect((await h.read((r) => r.profiles.profile()))!.nickname, 'Путник');
       expect((await h.read((r) => r.system.appState())).demoStage, Stage.space);

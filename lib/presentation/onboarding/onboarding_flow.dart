@@ -11,6 +11,7 @@ import '../components/strannik_tap_target.dart';
 import '../foundation/app_tokens.dart';
 import 'onboarding_assets.dart';
 import 'onboarding_controller.dart';
+import 'onboarding_explanation.dart';
 
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({super.key, required this.controller});
@@ -112,7 +113,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
-      final isDark = c.step != OnboardingStep.skin;
+      final isDark = !{
+        OnboardingStep.skin,
+        OnboardingStep.money,
+        OnboardingStep.care,
+        OnboardingStep.results,
+        OnboardingStep.parentReady,
+        OnboardingStep.pin,
+      }.contains(c.step);
       final keyboard = MediaQuery.viewInsetsOf(context).bottom > 0;
       return PopScope(
         canPop: c.step == OnboardingStep.intro && !c.busy,
@@ -132,12 +140,33 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             systemNavigationBarContrastEnforced: false,
           ),
           child: Scaffold(
-            backgroundColor: AppColors.blue,
+            backgroundColor: switch (c.step) {
+              OnboardingStep.money || OnboardingStep.pin => AppColors.lightBlue,
+              OnboardingStep.care ||
+              OnboardingStep.parentReady => AppColors.yellow,
+              OnboardingStep.results => AppColors.pink,
+              _ => AppColors.blue,
+            },
             resizeToAvoidBottomInset: true,
             body: Stack(
               fit: StackFit.expand,
               children: [
                 if (_background != null) _art(_background!, fit: BoxFit.cover),
+                if ({
+                  OnboardingStep.money,
+                  OnboardingStep.care,
+                  OnboardingStep.results,
+                  OnboardingStep.pin,
+                  OnboardingStep.parentReady,
+                }.contains(c.step))
+                  Transform.rotate(
+                    angle: 5.53 * math.pi / 180,
+                    child: OverflowBox(
+                      maxWidth: MediaQuery.sizeOf(context).width + 110,
+                      maxHeight: MediaQuery.sizeOf(context).height + 110,
+                      child: _art('paper_lines', fit: BoxFit.cover),
+                    ),
+                  ),
                 SafeArea(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -527,96 +556,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     ),
   );
 
-  Widget _explanation(double height) {
-    final index = c.step.index - OnboardingStep.money.index;
-    final title = const [
-      'Управлять деньгами',
-      'Заботиться обо мне',
-      'Результаты заметны сразу',
-    ][index];
-    final body = const [
-      'Научится планировать бюджет, отличать необходимое от желаемого, копить и безопасно совершать покупки в игровой валюте',
-      'Все знания сразу пригодятся в игре: ребёнок будет распределять фиры на нужды, желания и общую цель, и видеть последствия своих решений',
-      'В родительском разделе можно следить за освоенными темами и отправлять игровые фиры за успехи. Вы сможете следить за прогрессом',
-    ][index];
-    return _scroll(
-      height,
-      Column(
-        children: [
-          SizedBox(
-            height: math.min(420, height * .54),
-            width: double.infinity,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                _art(
-                  const [
-                    'parent_money',
-                    'parent_care_backdrop',
-                    'parent_results',
-                  ][index],
-                  fit: BoxFit.fill,
-                ),
-                if (index == 1)
-                  Align(
-                    alignment: Alignment.center,
-                    child: _art('parent_care_cat', width: 254, height: 288),
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
-            child: Column(
-              children: [
-                Text(
-                  'Что будет делать\nребёнок?',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.heading.copyWith(
-                    color: AppColors.white,
-                    height: 1,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.badge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  body,
-                  textAlign: TextAlign.center,
-                  style: AppTypography.body.copyWith(color: AppColors.white),
-                ),
-                const SizedBox(height: 20),
-                Semantics(
-                  label: 'Объяснение для родителя: ${index + 1} из 3',
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      3,
-                      (i) => Container(
-                        width: 6,
-                        height: 6,
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: i == index ? AppColors.white : AppColors.gray,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                _button('Далее', _next),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _explanation(double height) => OnboardingExplanation(
+    index: c.step.index - OnboardingStep.money.index,
+    onNext: c.busy ? null : _next,
+    onSkip: c.busy ? null : c.consent,
+  );
 
   Widget _parentPanel(double height, bool keyboard) {
     final pin = c.step == OnboardingStep.pin;
@@ -629,7 +573,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     final body = pin
         ? (c.existingPin
               ? 'PIN уже создан. Подтвердите его, чтобы продолжить знакомство.'
-              : 'Он защитит раздел, в котором можно смотреть прогресс и управлять профилем')
+              : 'Он защитит раздел для взрослых')
         : ready
         ? 'Если захотите посмотреть, как идут дела, откройте профиль ребёнка, там есть раздел «Для родителей».'
         : 'Передай телефон родителю — ${c.petName} расскажет о себе и о том, чем он сможет быть полезен в обмен на помощь с починкой корабля';
@@ -641,19 +585,64 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           children: [
             if (pin && !keyboard)
               Positioned(
-                left: -165,
-                right: -220,
-                bottom: -90,
-                height: 669,
-                child: _art('pin_cat', fit: BoxFit.fill),
+                left: -163,
+                width: 760,
+                top: 230 - MediaQuery.viewPaddingOf(context).top,
+                height: 683,
+                child: _art('pin_cat', fit: BoxFit.contain),
+              ),
+            if (pin && !keyboard)
+              Positioned(
+                right: 4,
+                top: 99 - MediaQuery.viewPaddingOf(context).top,
+                width: 218,
+                height: 217,
+                child: _art('pin_fish'),
+              ),
+            if (ready)
+              Positioned(
+                top: 147 - MediaQuery.viewPaddingOf(context).top,
+                left: 29,
+                right: 28,
+                height: 239,
+                child: LayoutBuilder(
+                  builder: (context, box) => ClipRect(
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: -box.maxWidth * .1863,
+                          top: -box.maxHeight * .2813,
+                          width: box.maxWidth * 1.3711,
+                          height: box.maxHeight * 1.742,
+                          child: _art('parent_ready_cat', fit: BoxFit.cover),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(10, 16, 10, 28),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE7E7E7),
-                  border: Border.all(color: AppColors.black, width: 6),
+                  color: c.step == OnboardingStep.handoff
+                      ? const Color(0xFFE7E7E7)
+                      : const Color(0xFFF3F4F6),
+                  border: Border.all(
+                    color: c.step == OnboardingStep.handoff
+                        ? AppColors.black
+                        : const Color(0xFFF3F4F6),
+                    width: 6,
+                  ),
+                  boxShadow: c.step == OnboardingStep.handoff
+                      ? null
+                      : const [
+                          BoxShadow(
+                            color: AppColors.black,
+                            offset: Offset(0, -5),
+                          ),
+                        ],
                   borderRadius: BorderRadius.circular(32),
                 ),
                 child: Column(
@@ -708,7 +697,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                     const SizedBox(height: 8),
                     _button(
                       pin
-                          ? (c.busy ? 'Сохраняем…' : 'Сохранить')
+                          ? (c.busy ? 'Сохраняем…' : 'Отправить')
                           : ready
                           ? 'Передать телефон ребёнку'
                           : 'Передать телефон родителю',

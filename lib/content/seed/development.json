@@ -24,7 +24,7 @@
       "id": "scarf",
       "title": "Шарфик",
       "category": "accessory",
-      "price": 15,
+      "price": 20,
       "interactionXp": 0,
       "assetId": "placeholder",
       "description": "Тестовый предмет"
@@ -42,7 +42,7 @@
       "id": "ball",
       "title": "Мяч",
       "category": "toy",
-      "price": 10,
+      "price": 15,
       "interactionXp": 10,
       "assetId": "placeholder",
       "description": "Тестовый предмет"
@@ -87,7 +87,7 @@
   "themes": [
     {
       "id": "theme1",
-      "title": "Тема 1",
+      "title": "Планируем бюджет",
       "order": 0
     },
     {
@@ -102,61 +102,189 @@
     },
     {
       "id": "fraud",
-      "title": "Безопасность",
+      "title": "Финансовая безопасность",
       "order": 3
+    },
+    {
+      "id": "space_theme1",
+      "title": "Покупки и скидки",
+      "order": 0,
+      "stage": "space"
+    },
+    {
+      "id": "home_planet_safety",
+      "title": "Финансовая безопасность",
+      "order": 2,
+      "stage": "homePlanet"
     }
   ],
   "tasks": [
     {
       "id": "theme1_task",
-      "themeId": "theme1",
-      "title": "Пример задания",
-      "type": "choice",
-      "rewardFira": 20,
+      "themeId": "space_theme1",
+      "title": "Список покупок",
+      "type": "shoppingList",
       "order": 0,
-      "contentReference": "placeholder",
-      "rewardPolicy": "oneTime"
+      "contentReference": "shopping_list_v1",
+      "rewardPolicy": "oneTime",
+      "rewardXp": 15,
+      "exerciseBudget": 350,
+      "products": [
+        {
+          "id": "popcorn",
+          "title": "Попкорн",
+          "price": 300,
+          "assetId": "popcorn"
+        },
+        {
+          "id": "juice",
+          "title": "Сок",
+          "price": 100,
+          "assetId": "juice"
+        },
+        {
+          "id": "chips",
+          "title": "Чипсы",
+          "price": 200,
+          "assetId": "chips"
+        },
+        {
+          "id": "apples",
+          "title": "Яблоки",
+          "price": 25,
+          "assetId": "apples"
+        }
+      ],
+      "description": "Планируем покупки для киновечера"
     },
     {
       "id": "theme2_task",
       "themeId": "theme2",
       "title": "Пример задания",
-      "type": "choice",
-      "rewardFira": 20,
+      "type": "retired",
       "order": 0,
       "contentReference": "placeholder",
-      "rewardPolicy": "oneTime"
+      "rewardPolicy": "repeatable",
+      "implemented": false,
+      "rewardFira": 0,
+      "enabled": false
     },
     {
       "id": "theme3_task",
       "themeId": "theme3",
       "title": "Пример задания",
-      "type": "choice",
-      "rewardFira": 20,
+      "type": "retired",
       "order": 0,
       "contentReference": "placeholder",
-      "rewardPolicy": "oneTime"
+      "rewardPolicy": "repeatable",
+      "implemented": false,
+      "rewardFira": 0,
+      "enabled": false
     },
     {
       "id": "fraud_task",
       "themeId": "fraud",
       "title": "Пример задания",
-      "type": "choice",
-      "rewardFira": 20,
+      "type": "retired",
       "order": 0,
       "contentReference": "placeholder",
-      "rewardPolicy": "oneTime"
+      "rewardPolicy": "repeatable",
+      "implemented": false,
+      "rewardFira": 0,
+      "enabled": false
     },
     {
       "id": "practice",
       "themeId": "theme1",
       "title": "Дополнительное учебное задание",
       "type": "choice",
-      "rewardFira": 5,
+      "rewardFira": 0,
       "order": 1,
       "contentReference": "placeholder",
       "rewardPolicy": "repeatable",
-      "repeatRule": "newCompletedAttempt"
+      "repeatRule": "newCompletedAttempt",
+      "implemented": false
+    },
+    {
+      "id": "space_theme1_task2",
+      "themeId": "space_theme1",
+      "title": "Ловушки скидок",
+      "description": "Учимся отличать выгодные предложения от уловок продавцов",
+      "type": "discountTraps",
+      "order": 1,
+      "contentReference": "discount_traps_v1",
+      "rewardPolicy": "oneTime",
+      "implemented": true,
+      "rewardXp": 15
+    },
+    {
+      "id": "space_theme1_task3",
+      "themeId": "space_theme1",
+      "title": "Выбираем с умом",
+      "description": "Сравниваем товары по цене, количеству и сроку годности",
+      "type": "unavailable",
+      "order": 2,
+      "contentReference": "choose_wisely",
+      "rewardPolicy": "oneTime",
+      "implemented": false,
+      "enabled": false
+    },
+    {
+      "id": "home_planet_safety_call",
+      "themeId": "home_planet_safety",
+      "title": "Секретный звонок",
+      "description": "Учимся распознавать мошенников",
+      "type": "financialSafety",
+      "stage": "homePlanet",
+      "rewardXp": 15,
+      "order": 0,
+      "contentReference": "financial_safety_call_v1",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "home_planet_safety_email",
+      "themeId": "home_planet_safety",
+      "title": "Поздравляем, ты выиграл!",
+      "description": "Чем опасны рассылки писем",
+      "type": "financialSafety",
+      "stage": "homePlanet",
+      "rewardXp": 15,
+      "order": 1,
+      "contentReference": "financial_safety_email_v1",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "earth_theme1_needs",
+      "themeId": "theme1",
+      "title": "Хочу или нужно?",
+      "description": "Учимся выбирать необходимое",
+      "type": "earthTopicOne",
+      "stage": "earth",
+      "order": 0,
+      "contentReference": "earth_topic_one_needs_v1",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "earth_theme1_weekly_budget",
+      "themeId": "theme1",
+      "title": "Планы на неделю",
+      "description": "Планируем расходы и накопления",
+      "type": "earthTopicOne",
+      "stage": "earth",
+      "order": 1,
+      "contentReference": "earth_topic_one_weekly_budget_v1",
+      "rewardPolicy": "oneTime"
+    },
+    {
+      "id": "earth_theme1_goal",
+      "themeId": "theme1",
+      "title": "Цель",
+      "description": "Выбираем цель и начинаем копить",
+      "type": "earthTopicOne",
+      "stage": "earth",
+      "order": 2,
+      "contentReference": "earth_topic_one_goal_v1",
+      "rewardPolicy": "oneTime"
     }
   ],
   "stageRequirements": [
@@ -229,7 +357,7 @@
       ]
     },
     {
-      "bigGoal": "adaptOnEarth",
+      "bigGoal": "spaceTaxi",
       "from": "earth",
       "to": "space",
       "requiredXp": 10,
@@ -246,7 +374,7 @@
       ]
     },
     {
-      "bigGoal": "adaptOnEarth",
+      "bigGoal": "spaceTaxi",
       "from": "space",
       "to": "homePlanet",
       "requiredXp": 20,

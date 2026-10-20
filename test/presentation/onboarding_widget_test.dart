@@ -70,10 +70,7 @@ void main() {
               );
             }
             if (keyboard > 0) {
-              final action = find.widgetWithText(
-                StrannikButton,
-                step == OnboardingStep.pin ? 'Сохранить' : 'Отправить',
-              );
+              final action = find.widgetWithText(StrannikButton, 'Отправить');
               await tester.ensureVisible(action);
               await tester.pumpAndSettle();
               expect(

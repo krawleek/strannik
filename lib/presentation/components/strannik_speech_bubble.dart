@@ -9,44 +9,49 @@ class StrannikSpeechBubble extends StatelessWidget {
     required this.name,
     required this.child,
     this.compact = false,
+    this.showName = true,
+    this.artwork = PresentationAssets.bubble,
   });
   final String name;
   final Widget child;
   final bool compact;
+  final bool showName;
+  final String artwork;
   @override
   Widget build(BuildContext context) => Stack(
     clipBehavior: Clip.none,
     children: [
-      Positioned.fill(top: 14, child: const _BubbleArtwork()),
+      Positioned.fill(top: 14, child: _BubbleArtwork(asset: artwork)),
       Padding(
         padding: compact
             ? const EdgeInsets.fromLTRB(15, 36, 17, 26)
             : const EdgeInsets.fromLTRB(20, 50, 20, 30),
         child: child,
       ),
-      Positioned(
-        top: 0,
-        left: 16,
-        right: 32,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppColors.darkOrange,
-              border: Border.fromBorderSide(AppBorders.nameBadge),
-              borderRadius: BorderRadius.circular(AppRadius.nameBadge),
-              boxShadow: const [AppShadows.nameBadge],
-            ),
-            child: Text(
-              name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.badge,
+      if (showName)
+        Positioned(
+          top: 0,
+          left: 16,
+          right: 32,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.darkOrange,
+                border: Border.fromBorderSide(AppBorders.nameBadge),
+                borderRadius: BorderRadius.circular(AppRadius.nameBadge),
+                boxShadow: const [AppShadows.nameBadge],
+              ),
+              child: Text(
+                name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.badge,
+              ),
             ),
           ),
         ),
-      ),
     ],
   );
 }
@@ -54,7 +59,8 @@ class StrannikSpeechBubble extends StatelessWidget {
 /// Explicit image patches avoid drawImageNine disappearing on Android OpenGLES.
 /// All pixels come from the original Figma contours; no illustration is redrawn.
 class _BubbleArtwork extends StatefulWidget {
-  const _BubbleArtwork();
+  const _BubbleArtwork({required this.asset});
+  final String asset;
   @override
   State<_BubbleArtwork> createState() => _BubbleArtworkState();
 }
@@ -71,8 +77,8 @@ class _BubbleArtworkState extends State<_BubbleArtwork> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _stream?.removeListener(_listener);
-    _stream = const AssetImage(
-      PresentationAssets.bubble,
+    _stream = AssetImage(
+      widget.asset,
     ).resolve(createLocalImageConfiguration(context))..addListener(_listener);
   }
 

@@ -7,13 +7,25 @@ import '../../content/local_content_repository.dart';
 import '../../data/local/database.dart';
 import '../../domain/repositories/repositories.dart';
 import '../home/home_controller.dart';
+import '../profile/profile_controller.dart';
+import '../store/store_controller.dart';
+import '../../app/profile_playtime.dart';
 import '../onboarding/onboarding_controller.dart';
 
 class HomeRuntime {
-  HomeRuntime._(this.database, this.controller, this.feedback, this.onboarding);
+  HomeRuntime._(
+    this.database,
+    this.controller,
+    this.feedback,
+    this.onboarding,
+    this.profile,
+    this.store,
+  );
   final LocalDatabase database;
   final HomeController controller;
   final FeedbackServices feedback;
+  final ProfileController profile;
+  final StoreController store;
   final OnboardingController? onboarding;
 
   static const developmentPreviewEnabled =
@@ -42,15 +54,26 @@ class HomeRuntime {
     );
     final onboarding = preview ? null : OnboardingController(game);
     if (onboarding != null) await onboarding.load();
+    final feedback = createFeedbackServices(database, platformOutputs: true);
+    final profile = ProfileController(
+      game,
+      feedback,
+      PlaytimeService(database.database),
+    );
     return HomeRuntime._(
       database,
       controller,
-      createFeedbackServices(database),
+      feedback,
       onboarding,
+      profile,
+      StoreController(game),
     );
   }
 
   Future<void> close() async {
+    await profile.playtime.checkpoint(stop: true);
+    profile.dispose();
+    store.dispose();
     onboarding?.dispose();
     controller.dispose();
     await database.close();

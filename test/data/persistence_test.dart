@@ -160,13 +160,13 @@ void main() {
     },
   );
   test('lockout is persistent across restart', () async {
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 3; i++) {
       await h.game.parentAccess.verifyPin('0000');
     }
     await h.db.close();
     h = await Harness.create(path: path);
     rejected(await h.game.parentAccess.verifyPin('1234'), Failure.pinLocked);
-    h.clock.advance(const Duration(seconds: 30));
+    h.clock.advance(const Duration(minutes: 5));
     success(await h.game.parentAccess.verifyPin('1234'));
   });
   test(

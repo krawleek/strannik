@@ -1,11 +1,17 @@
 import 'dart:convert';
 
+import 'economy_config.dart';
+
 import '../domain/models/models.dart';
+import '../core/result.dart';
 import '../domain/repositories/repositories.dart';
 
 /// Reads an explicitly provided bundled document; no networking or user state.
 class LocalContentRepository implements ContentRepository {
-  LocalContentRepository.fromJson(String source) {
+  LocalContentRepository.fromJson(
+    String source, {
+    this.economy = const EconomyRules(),
+  }) {
     final json = jsonDecode(source) as Map<String, dynamic>;
     if (json['schemaVersion'] != 1) {
       throw const FormatException('Unsupported content version');
@@ -34,7 +40,12 @@ class LocalContentRepository implements ContentRepository {
     );
     themes = List.unmodifiable(
       (json['themes'] as List).map(
-        (r) => LearningTheme(id: r['id'], title: r['title'], order: r['order']),
+        (r) => LearningTheme(
+          id: r['id'],
+          title: r['title'],
+          order: r['order'],
+          stage: Stage.values.byName(r['stage'] ?? 'earth'),
+        ),
       ),
     );
     tasks = List.unmodifiable(
@@ -44,7 +55,37 @@ class LocalContentRepository implements ContentRepository {
           themeId: r['themeId'],
           title: r['title'],
           type: r['type'],
-          rewardFira: r['rewardFira'],
+          rewardFira:
+              r['rewardFira'] ??
+              (r['implemented'] == false
+                  ? 0
+                  : EconomyConfig.firstCompletionReward),
+          stage: Stage.values.byName(
+            r['stage'] ??
+                themes
+                    .firstWhere(
+                      (t) => t.id == r['themeId'],
+                      orElse: () =>
+                          const LearningTheme(id: '', title: '', order: 0),
+                    )
+                    .stage
+                    .name,
+          ),
+          description: r['description'] ?? '',
+          implemented: r['implemented'] ?? true,
+          enabled: r['enabled'] ?? true,
+          rewardXp: r['rewardXp'] ?? 0,
+          exerciseBudget: r['exerciseBudget'] ?? 0,
+          products: List<LessonProduct>.unmodifiable(
+            (r['products'] as List? ?? []).map(
+              (p) => LessonProduct(
+                id: p['id'],
+                title: p['title'],
+                price: p['price'],
+                assetId: p['assetId'],
+              ),
+            ),
+          ),
           order: r['order'],
           contentReference: r['contentReference'],
           rewardPolicy: RewardPolicy.values.byName(r['rewardPolicy']),
@@ -71,6 +112,8 @@ class LocalContentRepository implements ContentRepository {
     savingsUnlockThemeId = json['savingsUnlockThemeId'];
     _validate();
   }
+  @override
+  final EconomyRules economy;
   @override
   late final List<StoreItem> storeItems;
   @override
@@ -113,13 +156,27 @@ class LocalContentRepository implements ContentRepository {
           unique(themes.map((v) => v.id)) &&
           unique(tasks.map((v) => v.id)),
     );
-    check(themes.length == 4 && unique(themes.map((v) => v.order)));
+    check(
+      themes.isNotEmpty &&
+          unique(themes.map((v) => '${v.stage.name}:${v.order}')),
+    );
     final themeIds = themes.map((v) => v.id).toSet();
     final resourceIds = resources.map((v) => v.id).toSet();
     check(themeIds.contains(savingsUnlockThemeId));
     for (final task in tasks) {
+      check(unique(task.products.map((p) => p.id)));
+      check(
+        task.products.every(
+          (p) => p.price > 0 && p.price <= maxGameValue && p.assetId.isNotEmpty,
+        ),
+      );
+      if (task.type == 'shoppingList') {
+        check(task.exerciseBudget > 0 && task.products.isNotEmpty);
+      }
       check(
         themeIds.contains(task.themeId) &&
+            task.stage ==
+                themes.firstWhere((t) => t.id == task.themeId).stage &&
             task.type.isNotEmpty &&
             task.contentReference.isNotEmpty,
       );
@@ -128,7 +185,7 @@ class LocalContentRepository implements ContentRepository {
       final ordered = tasks.where(
         (t) => t.themeId == theme.id && t.rewardPolicy == RewardPolicy.oneTime,
       );
-      check(ordered.isNotEmpty && unique(ordered.map((t) => t.order)));
+      check(unique(ordered.map((t) => t.order)));
     }
     for (final item in storeItems) {
       check(

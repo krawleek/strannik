@@ -82,7 +82,7 @@ void main() {
       expect(await h.balance(), 120);
     },
   );
-  test('repeatable rewards require distinct completed attempts; duplicate callbacks safe', () async {
+  test('repeat attempts close without additional rewards; duplicate callbacks safe', () async {
     final first = success(await h.game.learning.beginTask('practice'));
     final openAgain = success(await h.game.learning.beginTask('practice'));
     expect(openAgain.id, first.id);
@@ -97,11 +97,11 @@ void main() {
     success(
       await h.game.learning.completeLearningTask(next.id, successful: true),
     );
-    expect(await h.balance(), 110);
+    expect(await h.balance(), 105);
     expect(
       (await h.read((r) => r.learning.learningProgress('practice')))
           .completionCount,
-      2,
+      1,
     );
   });
   test('purchase debits catalog price, no XP, cannot duplicate permanent ownership', () async {

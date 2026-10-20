@@ -31,7 +31,10 @@ class GameContext {
   Future<bool> themeCompleted(Repositories r, String themeId) async {
     final tasks = content.tasks
         .where(
-          (t) => t.themeId == themeId && t.rewardPolicy == RewardPolicy.oneTime,
+          (t) =>
+              t.themeId == themeId &&
+              t.enabled &&
+              t.rewardPolicy == RewardPolicy.oneTime,
         )
         .toList();
     if (tasks.isEmpty) return false;
@@ -50,6 +53,7 @@ class GameContext {
     String? relatedId,
     String? title,
     String? category,
+    String? description,
   }) async {
     validAmount(amount, allowZero: true);
     if (key != null) {
@@ -69,6 +73,7 @@ class GameContext {
       relatedEntityId: relatedId,
       title: title,
       category: category,
+      description: description,
     );
     final balance = (await r.economy.wallet()).firaAmount;
     require(balance + tx.availableDelta >= 0, Failure.insufficientFunds);

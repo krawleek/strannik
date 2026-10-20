@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../foundation/app_tokens.dart';
+import '../foundation/feedback_scope.dart';
 
 class StrannikTapTarget extends StatefulWidget {
   const StrannikTapTarget({
@@ -23,6 +24,12 @@ class StrannikTapTarget extends StatefulWidget {
 
 class _StrannikTapTargetState extends State<StrannikTapTarget> {
   bool _focused = false, _pressed = false;
+  void _activate() {
+    if (widget.onTap == null) return;
+    FeedbackScope.tap(context);
+    widget.onTap!();
+  }
+
   @override
   Widget build(BuildContext context) => Semantics(
     label: widget.label,
@@ -30,7 +37,7 @@ class _StrannikTapTargetState extends State<StrannikTapTarget> {
     enabled: widget.onTap != null,
     selected: widget.selected,
     expanded: widget.expanded,
-    onTap: widget.onTap,
+    onTap: widget.onTap == null ? null : _activate,
     excludeSemantics: true,
     child: FocusableActionDetector(
       enabled: widget.onTap != null,
@@ -42,14 +49,14 @@ class _StrannikTapTargetState extends State<StrannikTapTarget> {
       actions: {
         ActivateIntent: CallbackAction<ActivateIntent>(
           onInvoke: (_) {
-            widget.onTap?.call();
+            _activate();
             return null;
           },
         ),
       },
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.onTap,
+        onTap: widget.onTap == null ? null : _activate,
         onTapDown: widget.onTap == null
             ? null
             : (_) => setState(() => _pressed = true),

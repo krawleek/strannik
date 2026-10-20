@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:sqflite/sqflite.dart' hide Transaction;
 
 import '../../domain/models/models.dart';
@@ -252,6 +254,27 @@ class SqliteRepositories
     {'id': v.id, 'category': v.category.name, 'quantity': v.quantity},
   );
   @override
+  Future<LearningTopicProgress> topicProgress(String topicId) async {
+    final row = await one(
+      'learning_topic_progress',
+      where: 'topic_id=?',
+      args: [topicId],
+    );
+    return LearningTopicProgress(
+      topicId: topicId,
+      completedAt: nullableDate(row?['completed_at']),
+      finaleStep: row?['finale_step'] as int? ?? 0,
+    );
+  }
+
+  @override
+  Future<void> saveTopicProgress(LearningTopicProgress value) =>
+      put('learning_topic_progress', {
+        'topic_id': value.topicId,
+        'completed_at': value.completedAt?.millisecondsSinceEpoch,
+        'finale_step': value.finaleStep,
+      }, key: 'topic_id');
+  @override
   Future<LearningProgress> learningProgress(String taskId) async {
     final r = await one(
       'learning_progress',
@@ -277,6 +300,9 @@ class SqliteRepositories
   LearningAttempt attemptRow(Map<String, Object?> r) => LearningAttempt(
     id: r['id'] as String,
     taskId: r['task_id'] as String,
+    lessonState: Map<String, Object?>.from(
+      jsonDecode(r['lesson_state'] as String) as Map,
+    ),
     startedAt: date(r['started_at']),
     completedAt: nullableDate(r['completed_at']),
   );
@@ -301,6 +327,7 @@ class SqliteRepositories
     'id': v.id,
     'task_id': v.taskId,
     'started_at': v.startedAt.millisecondsSinceEpoch,
+    'lesson_state': jsonEncode(v.lessonState),
     'completed_at': v.completedAt?.millisecondsSinceEpoch,
   });
   @override
@@ -311,6 +338,7 @@ class SqliteRepositories
         : BigGoal(
             BigGoalType.values.byName(r['type'] as String),
             confirmedAt: nullableDate(r['confirmed_at']),
+            completedAt: nullableDate(r['completed_at']),
           );
   }
 
@@ -319,6 +347,7 @@ class SqliteRepositories
     'id': 1,
     'type': v.type.name,
     'confirmed_at': v.confirmedAt?.millisecondsSinceEpoch,
+    'completed_at': v.completedAt?.millisecondsSinceEpoch,
   });
   GamePeriod periodRow(Map<String, Object?> r) => GamePeriod(
     id: r['id'] as String,
@@ -485,6 +514,7 @@ class SqliteRepositories
       'period_summaries',
       'transactions',
       'progress_events',
+      'learning_topic_progress',
       'learning_attempts',
       'learning_progress',
       'game_periods',
@@ -494,6 +524,7 @@ class SqliteRepositories
       'budget_allocation',
       'pet',
       'tooltip_flags',
+      'playtime',
     ]) {
       await db.delete(table);
     }
@@ -514,6 +545,7 @@ class SqliteRepositories
       'sound_enabled': 1,
       'music_enabled': 1,
       'haptics_enabled': 1,
+      'notifications_enabled': 0,
     }, where: 'id = 1');
   }
 }
