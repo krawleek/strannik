@@ -83,6 +83,7 @@ Updated:
 - `test/domain/stage_assignment_test.dart` (current published curriculum, async map refresh)
 - `lib/presentation/learning/discount_traps_screen.dart` (regression fixes for price-tag row and unconstrained falling label height)
 - `test/presentation/discount_traps_widget_test.dart`, `integration_test/stage_progress_flow_test.dart` (analysis/formatting fixes)
+- `android/app/build.gradle.kts` (explicit `Properties` import; debug build otherwise failed after an independent signing configuration update)
 - `PRODUCT.md`, `assets/learning/SAFETY_ASSETS.md`, this report.
 
 ## 10. Tests, build and screenshots
@@ -94,7 +95,7 @@ Updated:
 - Android Stage 3 UI run: **passed**, `emulator-5562`, both lessons with wrong-answer recovery, full guide, both finale scenes, SQLite reopen, both replays. Final isolated wallet **610**, XP **60**. Log: `/tmp/stage3-android-qa.log`; screenshots: `build/safety-qa/android-topic/`.
 - Topic UI screenshots at 360 and 320 logical width: `build/safety-qa/topic/`. Manrope and MaterialIcons are loaded for visual QA. Original illustration assets, scrolling and system insets verified.
 
-Final full suite: **158 tests passed** (`/tmp/stage3-quality-tests-verified.log`). `flutter analyze`: **No issues found**. `dart format .`: **133 files formatted**, no format failures. The first full-suite attempts exposed old fixture/async failures, then a concurrent Android build temporarily removed the macOS SQLite native asset. After repairing fixtures and running the suite after Android compilation, all checks passed. No production behavior or tests were removed to suppress failures.
+Final full suite: **160 tests passed** (`/tmp/stage3-final-all-tests.log`). `flutter analyze`: **No issues found**. `dart format .`: completed successfully. The first full-suite attempts exposed old fixture/async failures, then a concurrent Android build temporarily removed the macOS SQLite native asset. After repairing fixtures and running the suite after Android compilation, all checks passed. No production behavior or tests were removed to suppress failures.
 
 Complete new-player Android journey remains under verification; results follow below.
 

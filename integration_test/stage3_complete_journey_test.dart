@@ -82,8 +82,6 @@ void main() {
       }
 
       Future<void> tap(Finder f) async {
-        FocusManager.instance.primaryFocus?.unfocus();
-        await SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
         await settle();
         await wait(f);
         await t.ensureVisible(f.first);
@@ -97,8 +95,11 @@ void main() {
         final field = find.widgetWithText(TextField, label);
         await wait(field);
         await t.ensureVisible(field);
+        await t.tap(field);
+        await settle();
         await t.enterText(field, value);
         await settle();
+        expect(t.widget<TextField>(field).controller!.text, value);
       }
 
       Future<void> capture(String name) async {
@@ -253,11 +254,11 @@ void main() {
               matching: find.byType(ListView),
             )
             .last;
-        for (var i = 0; i < 12 && item.evaluate().isEmpty; i++) {
-          await t.drag(list, const Offset(-180, 0));
+        for (var i = 0; i < 20 && item.hitTestable().evaluate().isEmpty; i++) {
+          await t.drag(list, Offset(title == 'Мяч' ? 160 : -160, 0));
           await settle();
         }
-        await tap(item);
+        await tap(item.hitTestable());
         await tap(find.bySemanticsLabel('Корзина'));
         await tap(find.text('Купить'));
         await tap(find.text('Нужно'));

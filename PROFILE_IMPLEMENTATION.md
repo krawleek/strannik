@@ -1,5 +1,7 @@
 # Child profile and parent area
 
+> Исторический технический отчёт отдельного этапа. Его числа тестов и ограничения не описывают весь текущий продукт. Актуальная ревизия от 20.10.2026: [docs/DOCUMENTATION_AUDIT.md](docs/DOCUMENTATION_AUDIT.md); маршрут жюри — [docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md).
+
 Implemented in the existing Flutter app; primary visual reference is Figma frame
 `40000126:19936` (360×800). Profile is opened through the existing child-avatar
 navigation destination. The native status and navigation bars are retained.
