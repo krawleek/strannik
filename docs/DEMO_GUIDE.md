@@ -4,7 +4,7 @@
 
 ## Установка
 
-Используйте Android 8.0+ и проверенный APK, предоставленный командой. Публичная ссылка на конкурсный APK пока не оформлена. Не используйте случайный APK из старого прогона тестов: integration-сборка может запускать тест вместо обычной игры.
+Используйте Android 8.0+ и проверенный APK, предоставленный командой. Release APK `1.0.0+1` собран локально: `build/app/outputs/flutter-apk/app-release.apk`; подпись проверена, установка именно этого файла ещё не проверялась. [Контрольная сумма и сведения о подписи](RELEASE_READINESS.md). **[Скачать APK](https://github.com/krawleek/strannik/releases/download/v1.0.0/app-release.apk)** · [Страница предварительного релиза](https://github.com/krawleek/strannik/releases/tag/v1.0.0). Не используйте случайный APK из старого прогона тестов: integration-сборка может запускать тест вместо обычной игры.
 
 Из исходников: установите Android toolchain и Flutter, выполните `flutter doctor`, `flutter pub get`, `flutter devices`, затем `flutter run -d <device-id>`. Для обычного debug APK: `flutter build apk --debug`; файл появится в `build/app/outputs/flutter-apk/app-debug.apk`.
 
